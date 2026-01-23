@@ -8,7 +8,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "ionic:build": "npm run build",
+    "ionic:build": "npm run build && (npx cap add ios || true) && npx cap sync ios",
     "ionic:cap-copy": "npx cap copy"
   },
   "dependencies": {
