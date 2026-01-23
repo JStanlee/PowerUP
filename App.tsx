@@ -4,12 +4,11 @@ import { HashRouter as Router, Routes, Route, Link, useLocation, Navigate, usePa
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
-import { GoalType, UserProfile, WorkoutSession, AppState, ExerciseLog, PlanType, Language, Gender } from './types.ts';
+import { GoalType, UserProfile, WorkoutSession, AppState, ExerciseLog, PlanType, Gender } from './types.ts';
 import { generateWorkout, getCoachTip, generateExerciseImage, swapExercise } from './services/geminiService.ts';
 
 const STORAGE_KEY = 'wykuci_black_edition_v3';
 
-// Funkcja usuwająca polskie znaki
 const latinize = (str: string | undefined | null) => {
   if (!str) return '';
   const mapping: {[key: string]: string} = {
@@ -19,7 +18,6 @@ const latinize = (str: string | undefined | null) => {
   return str.split('').map(char => mapping[char] || char).join('');
 };
 
-// Haptyka Helper
 const triggerHaptic = (enabled: boolean, pattern: number | number[]) => {
   if (enabled && window.navigator && window.navigator.vibrate) {
     window.navigator.vibrate(pattern);
@@ -47,142 +45,72 @@ const COMMON_INJURIES = [
   "Inne / Wiele obszarów"
 ];
 
-const TRANSLATIONS = {
-  pl: {
-    dashboard: "Panel",
-    history: "Historia",
-    settings: "Profil",
-    startWorkout: "ROZPOCZNIJ TRENING",
-    newPlan: "Wybierz Styl",
-    activeWorkout: "Sesja Treningowa",
-    rest: "Odpoczynek",
-    finish: "Zakończ",
-    save: "Zapisz",
-    kg: "kg",
-    reps: "powt.",
-    sets: "Serie",
-    notes: "Notatki",
-    onboardingTitle: "Wykuci AI",
-    next: "Dalej",
-    back: "Wróć",
-    aiTip: "Wskazówka AI",
-    swap: "Zmień ćwiczenie",
-    visual: "Obraz AI",
-    congrats: "Trening Ukończony!",
-    xp: "XP Zdobyte",
-    level: "Poziom",
-    proTitle: "Wykuj Moc PRO",
-    proDesc: "Brak reklam, nielimitowane AI.",
-    getPro: "AKTYWUJ PRO (30 DNI)",
-    isPro: "JESTEŚ PRO",
-    exportPdf: "EKSPORTUJ PDF",
-    workoutDetails: "Szczegóły Treningu",
-    adLabel: "REKLAMA",
-    proUpsell: "Darmowy limit wymian wyczerpany. Chcesz odblokować nielimitowane funkcje AI?",
-    watchAd: "OBEJRZYJ REKLAMĘ (+1 wymiana)",
-    watchAdProgress: "Trwa odtwarzanie reklamy...",
-    language: "Język",
-    gender: "Płeć",
-    male: "Mężczyzna",
-    female: "Kobieta",
-    other: "Nie chcę podawać",
-    goal: "Twój Cel",
-    suggested: "SUGEROWANE",
-    deleteEx: "Usuń ćwiczenie",
-    confirmDelete: "Czy na pewno chcesz usunąć to ćwiczenie z obecnego treningu?",
-    warmupTitle: "Rozgrzewka AI",
-    startMain: "ROZPOCZNIJ TRENING GŁÓWNY",
-    experienceLevel: "Twój Poziom",
-    age: "Wiek",
-    weight: "Waga (kg)",
-    height: "Wzrost (cm)",
-    powerScore: "Power Score",
-    injuriesLabel: "Kontuzje i ograniczenia",
-    injuriesPlaceholder: "Wybierz obszar...",
-    defaultPlanLabel: "Domyślny Styl Treningu",
-    pdfLocked: "Eksport do PDF dostępny tylko dla użytkowników PRO.",
-    hapticsLabel: "Sygnały Haptyczne (Wibracje)",
-    levels: {
-      początkujący: "Początkujący",
-      średniozaawansowany: "Średniozaawansowany",
-      zaawansowany: "Zaawansowany"
-    },
-    planTypes: {
-      [PlanType.AI_ADVISOR]: "Doradca AI",
-      [PlanType.FBW]: "Full Body Workout",
-      [PlanType.PPL]: "Push Pull Legs",
-      [PlanType.SPLIT]: "Split",
-      [PlanType.HOME_BODYWEIGHT]: "Trening Domowy",
-      [PlanType.CARDIO]: "Cardio / Kondycja"
-    }
+const T = {
+  dashboard: "Panel",
+  history: "Historia",
+  settings: "Profil",
+  startWorkout: "ROZPOCZNIJ TRENING",
+  newPlan: "Wybierz Styl",
+  activeWorkout: "Sesja Treningowa",
+  rest: "Odpoczynek",
+  finish: "Zakończ",
+  save: "Zapisz",
+  kg: "kg",
+  reps: "powt.",
+  sets: "Serie",
+  notes: "Notatki",
+  onboardingTitle: "Wykuci AI",
+  next: "Dalej",
+  back: "Wróć",
+  aiTip: "Wskazówka AI",
+  swap: "Zmień ćwiczenie",
+  visual: "Obraz AI",
+  congrats: "Trening Ukończony!",
+  xp: "XP Zdobyte",
+  level: "Poziom",
+  proTitle: "Wykuj Moc PRO",
+  proDesc: "Brak reklam, nielimitowane AI.",
+  getPro: "AKTYWUJ PRO (30 DNI)",
+  isPro: "JESTEŚ PRO",
+  exportPdf: "EKSPORTUJ PDF",
+  workoutDetails: "Szczegóły Treningu",
+  adLabel: "REKLAMA",
+  proUpsell: "Darmowy limit wymian wyczerpany. Chcesz odblokować nielimitowane funkcje AI?",
+  watchAd: "OBEJRZYJ REKLAMĘ (+1 wymiana)",
+  watchAdProgress: "Trwa odtwarzanie reklamy...",
+  language: "Język",
+  gender: "Płeć",
+  male: "Mężczyzna",
+  female: "Kobieta",
+  other: "Nie chcę podawać",
+  goal: "Twój Cel",
+  suggested: "SUGEROWANE",
+  deleteEx: "Usuń ćwiczenie",
+  confirmDelete: "Czy na pewno chcesz usunąć to ćwiczenie z obecnego treningu?",
+  warmupTitle: "Rozgrzewka AI",
+  startMain: "ROZPOCZNIJ TRENING GŁÓWNY",
+  experienceLevel: "Twój Poziom",
+  age: "Wiek",
+  weight: "Waga (kg)",
+  height: "Wzrost (cm)",
+  powerScore: "Power Score",
+  injuriesLabel: "Kontuzje i ograniczenia",
+  injuriesPlaceholder: "Wybierz obszar...",
+  defaultPlanLabel: "Domyślny Styl Treningu",
+  pdfLocked: "Eksport do PDF dostępny tylko dla użytkowników PRO.",
+  hapticsLabel: "Sygnały Haptyczne (Wibracje)",
+  levels: {
+    początkujący: "Początkujący",
+    średniozaawansowany: "Średniozaawansowany",
+    zaawansowany: "Zaawansowany"
   },
-  en: {
-    dashboard: "Dashboard",
-    history: "History",
-    settings: "Profile",
-    startWorkout: "START WORKOUT",
-    newPlan: "Select Style",
-    activeWorkout: "Training Session",
-    rest: "Rest",
-    finish: "Finish",
-    save: "Save",
-    kg: "kg",
-    reps: "reps",
-    sets: "Sets",
-    notes: "Notes",
-    onboardingTitle: "Wykuci AI",
-    next: "Next",
-    back: "Back",
-    aiTip: "AI Tip",
-    swap: "Swap Exercise",
-    visual: "AI Visual",
-    congrats: "Workout Finished!",
-    xp: "XP Earned",
-    level: "Level",
-    proTitle: "Sculpt PRO Power",
-    proDesc: "No ads, unlimited AI.",
-    getPro: "ACTIVATE PRO (30 DAYS)",
-    isPro: "YOU ARE PRO",
-    exportPdf: "EXPORT PDF",
-    workoutDetails: "Workout Details",
-    adLabel: "ADVERTISEMENT",
-    proUpsell: "Free swap limit reached. Do you want to unlock unlimited AI features?",
-    watchAd: "WATCH AD (+1 swap)",
-    watchAdProgress: "Playing advertisement...",
-    language: "Language",
-    gender: "Gender",
-    male: "Male",
-    female: "Female",
-    other: "Prefer not to say",
-    goal: "Your Goal",
-    suggested: "SUGGESTED",
-    deleteEx: "Remove exercise",
-    confirmDelete: "Are you sure you want to remove this exercise from the current workout?",
-    warmupTitle: "AI Warmup",
-    startMain: "START MAIN WORKOUT",
-    experienceLevel: "Your Level",
-    age: "Age",
-    weight: "Weight (kg)",
-    height: "Height (cm)",
-    powerScore: "Power Score",
-    injuriesLabel: "Injuries and Limitations",
-    injuriesPlaceholder: "Select area...",
-    defaultPlanLabel: "Default Training Style",
-    pdfLocked: "PDF Export is available for PRO users only.",
-    hapticsLabel: "Haptic Feedback (Vibrations)",
-    levels: {
-      początkujący: "Beginner",
-      średniozaawansowany: "Intermediate",
-      zaawansowany: "Advanced"
-    },
-    planTypes: {
-      [PlanType.AI_ADVISOR]: "AI Advisor",
-      [PlanType.FBW]: "Full Body Workout",
-      [PlanType.PPL]: "Push Pull Legs",
-      [PlanType.SPLIT]: "Split",
-      [PlanType.HOME_BODYWEIGHT]: "Home Workout",
-      [PlanType.CARDIO]: "Cardio / Endurance"
-    }
+  planTypes: {
+    [PlanType.AI_ADVISOR]: "Doradca AI",
+    [PlanType.FBW]: "Full Body Workout",
+    [PlanType.PPL]: "Push Pull Legs",
+    [PlanType.SPLIT]: "Split",
+    [PlanType.HOME_BODYWEIGHT]: "Trening Domowy",
+    [PlanType.CARDIO]: "Cardio / Kondycja"
   }
 };
 
@@ -192,9 +120,9 @@ const formatTime = (seconds: number) => {
   return `${m}:${s.toString().padStart(2, '0')}`;
 };
 
-const BannerAd = ({ t }: { t: any }) => (
+const BannerAd = () => (
   <div className="w-full glass h-10 flex items-center justify-center border-t border-white/5 relative overflow-hidden shrink-0">
-    <span className="absolute top-1 left-2 text-[6px] font-black text-slate-400 uppercase tracking-tighter">{t.adLabel}</span>
+    <span className="absolute top-1 left-2 text-[6px] font-black text-slate-400 uppercase tracking-tighter">{T.adLabel}</span>
     <div className="flex items-center gap-3 opacity-20">
       <i className="fa-solid fa-rectangle-ad text-lg text-gold"></i>
       <div className="w-24 h-1 bg-slate-800 rounded-full animate-pulse"></div>
@@ -202,7 +130,7 @@ const BannerAd = ({ t }: { t: any }) => (
   </div>
 );
 
-const FullscreenAd = ({ onClose, t }: { onClose: () => void, t: any }) => {
+const FullscreenAd = ({ onClose }: { onClose: () => void }) => {
   const [timer, setTimer] = useState(3);
   
   useEffect(() => {
@@ -227,7 +155,7 @@ const FullscreenAd = ({ onClose, t }: { onClose: () => void, t: any }) => {
            <i className="fa-solid fa-bolt text-5xl text-gold animate-bounce"></i>
         </div>
         <div className="text-center space-y-2">
-          <p className="text-[10px] font-black uppercase text-slate-400 tracking-[0.4em]">{t.adLabel}</p>
+          <p className="text-[10px] font-black uppercase text-slate-400 tracking-[0.4em]">{T.adLabel}</p>
           <h3 className="text-2xl font-black uppercase text-gold tracking-tight">WYKUCI PRO</h3>
           <p className="text-sm text-slate-300 font-medium opacity-80 px-4">Twoja transformacja nie zna granic.</p>
         </div>
@@ -239,7 +167,7 @@ const FullscreenAd = ({ onClose, t }: { onClose: () => void, t: any }) => {
   );
 };
 
-const Dashboard: React.FC<{ state: AppState, setState: any, t: any }> = ({ state, setState, t }) => {
+const Dashboard: React.FC<{ state: AppState, setState: any }> = ({ state, setState }) => {
   const isWorkoutActive = !!state.activeWorkout;
   const isPro = state.profile?.isPro;
 
@@ -253,11 +181,11 @@ const Dashboard: React.FC<{ state: AppState, setState: any, t: any }> = ({ state
       const score = Math.round((totalVolume / userWeightFactor) + intensityBonus);
       
       return {
-        date: new Date(s.date).toLocaleDateString(state.profile?.language === 'pl' ? 'pl-PL' : 'en-US', { day: 'numeric', month: 'short' }),
+        date: new Date(s.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' }),
         value: score
       };
     });
-  }, [state.history, state.profile?.language, state.profile?.weight]);
+  }, [state.history, state.profile?.weight]);
 
   const streakDays = useMemo(() => {
     const today = new Date();
@@ -266,10 +194,10 @@ const Dashboard: React.FC<{ state: AppState, setState: any, t: any }> = ({ state
       const d = new Date();
       d.setDate(today.getDate() - i);
       const hasWorkout = state.history.some(s => new Date(s.date).toDateString() === d.toDateString());
-      days.push({ day: d.toLocaleDateString(state.profile?.language === 'pl' ? 'pl-PL' : 'en-US', { weekday: 'narrow' }), active: hasWorkout });
+      days.push({ day: d.toLocaleDateString('pl-PL', { weekday: 'narrow' }), active: hasWorkout });
     }
     return days;
-  }, [state.history, state.profile?.language]);
+  }, [state.history]);
 
   return (
     <div className="flex-1 px-5 pt-4 overflow-y-auto no-scrollbar space-y-4 animate-fadeIn safe-pt">
@@ -314,7 +242,7 @@ const Dashboard: React.FC<{ state: AppState, setState: any, t: any }> = ({ state
         <div className="flex items-center justify-between">
            <div className="flex items-center gap-2 opacity-90">
               <i className="fa-solid fa-bolt-lightning text-gold text-[10px]"></i>
-              <h3 className="text-[9px] font-black text-white uppercase tracking-[0.2em]">{t.powerScore}</h3>
+              <h3 className="text-[9px] font-black text-white uppercase tracking-[0.2em]">{T.powerScore}</h3>
            </div>
            <div className="text-[7px] font-black text-gold bg-gold/10 px-1.5 py-0.5 rounded border border-gold/20 uppercase">Trend</div>
         </div>
@@ -369,7 +297,7 @@ const Dashboard: React.FC<{ state: AppState, setState: any, t: any }> = ({ state
         className="block w-full gold-shimmer p-4 rounded-xl text-center shadow-[0_12px_24px_rgba(212,175,55,0.25)] tap-scale transition-all"
       >
         <span className="text-white font-black text-sm tracking-widest uppercase">
-          {isWorkoutActive ? "KONTYNUUJ SESJĘ" : t.startWorkout}
+          {isWorkoutActive ? "KONTYNUUJ SESJĘ" : T.startWorkout}
         </span>
       </Link>
       
@@ -378,7 +306,7 @@ const Dashboard: React.FC<{ state: AppState, setState: any, t: any }> = ({ state
   );
 };
 
-const ActiveWorkout: React.FC<{ state: AppState, onUpdate: (w: WorkoutSession) => void, onSetPrefRest: (t: number) => void, onFinish: (n: string, d: number) => void, onTogglePro: () => void, t: any }> = ({ state, onUpdate, onSetPrefRest, onFinish, onTogglePro, t }) => {
+const ActiveWorkout: React.FC<{ state: AppState, onUpdate: (w: WorkoutSession) => void, onSetPrefRest: (t: number) => void, onFinish: (n: string, d: number) => void, onTogglePro: () => void }> = ({ state, onUpdate, onSetPrefRest, onFinish, onTogglePro }) => {
   const workout = state.activeWorkout;
   const isPro = state.profile?.isPro;
   const [expandedEx, setExpandedEx] = useState<string | null>(null);
@@ -415,7 +343,7 @@ const ActiveWorkout: React.FC<{ state: AppState, onUpdate: (w: WorkoutSession) =
       <div className="flex-1 flex flex-col h-full bg-black relative overflow-hidden safe-pt">
         <header className="px-5 py-4 glass border-b border-white/5 flex items-center gap-3">
           <i className="fa-solid fa-fire text-gold"></i>
-          <h2 className="text-xl font-black uppercase tracking-tighter text-white">{t.warmupTitle}</h2>
+          <h2 className="text-xl font-black uppercase tracking-tighter text-white">{T.warmupTitle}</h2>
         </header>
         <div className="flex-1 overflow-y-auto no-scrollbar p-5 space-y-4">
            {workout.warmup.map((ex, idx) => (
@@ -430,7 +358,7 @@ const ActiveWorkout: React.FC<{ state: AppState, onUpdate: (w: WorkoutSession) =
         </div>
         <div className="p-5 safe-area-pb">
           <button onClick={() => onUpdate({ ...workout, warmupCompleted: true })} className="w-full gold-shimmer py-4 rounded-xl text-white font-black uppercase tracking-widest tap-scale shadow-2xl">
-            {t.startMain}
+            {T.startMain}
           </button>
         </div>
       </div>
@@ -445,12 +373,9 @@ const ActiveWorkout: React.FC<{ state: AppState, onUpdate: (w: WorkoutSession) =
       setRestTime(prev => {
         if (prev && prev > 1) return prev - 1;
         if (restRef.current) clearInterval(restRef.current);
-        
-        // Koniec odpoczynku
         triggerHaptic(state.profile?.hapticsEnabled || false, [100, 50, 100]);
         setRestFinishedFlash(true);
         setTimeout(() => setRestFinishedFlash(false), 2000);
-        
         return null;
       });
     }, 1000);
@@ -462,12 +387,10 @@ const ActiveWorkout: React.FC<{ state: AppState, onUpdate: (w: WorkoutSession) =
     if (!ex) return;
     const isNowCompleted = !ex.sets[setIdx].completed;
     ex.sets[setIdx].completed = isNowCompleted;
-    
     if (isNowCompleted) {
       triggerHaptic(state.profile?.hapticsEnabled || false, 20);
       startRest(state.profile?.preferredRestTime || 60);
     }
-    
     if (ex.sets.every(s => s.completed)) {
       const nextEx = updated.exercises.find(e => !e.sets.every(s => s.completed));
       if (nextEx) setExpandedEx(nextEx.id);
@@ -581,7 +504,7 @@ const ActiveWorkout: React.FC<{ state: AppState, onUpdate: (w: WorkoutSession) =
               <div onClick={() => { setExpandedEx(isExp ? null : ex.id); triggerHaptic(state.profile?.hapticsEnabled || false, 5); }} className="p-3.5 flex items-center justify-between">
                 <div className="flex-1 min-w-0 pr-3">
                   <h4 className={`text-xs font-black uppercase tracking-tight leading-tight line-clamp-2 ${isDone ? 'text-gold line-through' : 'text-white'}`}>{ex.name}</h4>
-                  <p className="text-[8px] text-slate-400 font-bold uppercase mt-0.5 tracking-wider">{ex.muscleGroup} • {ex.sets.length} {t.sets}</p>
+                  <p className="text-[8px] text-slate-400 font-bold uppercase mt-0.5 tracking-wider">{ex.muscleGroup} • {ex.sets.length} {T.sets}</p>
                 </div>
                 <div className="flex gap-1.5 shrink-0 ml-1">
                   <button onClick={(e) => { e.stopPropagation(); handleAIGuide(ex); }} className="w-7 h-7 rounded-lg glass border border-white/10 flex items-center justify-center text-[9px] text-white tap-scale"><i className="fa-solid fa-wand-magic-sparkles"></i></button>
@@ -703,7 +626,7 @@ const ActiveWorkout: React.FC<{ state: AppState, onUpdate: (w: WorkoutSession) =
            {isWatchingAd ? (
              <div className="flex flex-col items-center gap-5 animate-pulse">
                 <i className="fa-solid fa-clapperboard text-5xl text-gold"></i>
-                <p className="text-[10px] font-black text-white uppercase tracking-widest">{t.watchAdProgress}</p>
+                <p className="text-[10px] font-black text-white uppercase tracking-widest">{T.watchAdProgress}</p>
                 <div className="w-40 h-1 bg-slate-800 rounded-full overflow-hidden">
                    <div className="h-full bg-gold animate-shimmer gold-shimmer" style={{ width: '100%' }}></div>
                 </div>
@@ -713,7 +636,7 @@ const ActiveWorkout: React.FC<{ state: AppState, onUpdate: (w: WorkoutSession) =
                 <div className="w-16 h-16 gold-shimmer rounded-2xl flex items-center justify-center text-white text-3xl mx-auto shadow-2xl"><i className="fa-solid fa-crown"></i></div>
                 <div className="space-y-2.5">
                   <h3 className="text-xl font-black uppercase text-gold leading-none tracking-tighter">LIMIT AI WYCZERPANY</h3>
-                  <p className="text-slate-400 text-[10px] font-medium italic opacity-90 leading-relaxed px-4">"{t.proUpsell}"</p>
+                  <p className="text-slate-400 text-[10px] font-medium italic opacity-90 leading-relaxed px-4">"{T.proUpsell}"</p>
                 </div>
                 
                 <div className="space-y-2.5">
@@ -723,7 +646,7 @@ const ActiveWorkout: React.FC<{ state: AppState, onUpdate: (w: WorkoutSession) =
                   </button>
                   <button onClick={handleWatchAd} className="w-full py-3.5 bg-slate-800/80 border border-white/5 rounded-xl text-slate-100 font-black uppercase text-[9px] tracking-widest tap-scale flex items-center justify-center gap-2.5">
                      <i className="fa-solid fa-video text-gold"></i>
-                     {t.watchAd}
+                     {T.watchAd}
                   </button>
                 </div>
                 
@@ -737,8 +660,8 @@ const ActiveWorkout: React.FC<{ state: AppState, onUpdate: (w: WorkoutSession) =
         <div className="absolute inset-0 bg-black/95 backdrop-blur-3xl z-[300] p-7 flex flex-col items-center justify-center animate-fadeIn">
           <div className="glass-card border border-gold/40 rounded-3xl p-7 w-full max-sm space-y-5 text-center shadow-2xl">
             <div className="w-12 h-12 gold-shimmer rounded-xl flex items-center justify-center text-white mx-auto shadow-2xl animate-bounce"><i className="fa-solid fa-trophy text-xl"></i></div>
-            <h2 className="text-xl font-black uppercase text-white tracking-tight">{t.congrats}</h2>
-            <textarea placeholder={t.notes} value={notes} onChange={e => setNotes(e.target.value)} className="w-full bg-black/60 rounded-xl p-3.5 border border-white/10 text-[10px] text-white h-24 focus:border-gold outline-none resize-none shadow-inner" />
+            <h2 className="text-xl font-black uppercase text-white tracking-tight">{T.congrats}</h2>
+            <textarea placeholder={T.notes} value={notes} onChange={e => setNotes(e.target.value)} className="w-full bg-black/60 rounded-xl p-3.5 border border-white/10 text-[10px] text-white h-24 focus:border-gold outline-none resize-none shadow-inner" />
             <div className="flex gap-3">
               <button onClick={() => setShowFinish(false)} className="flex-1 py-3 bg-slate-800 text-slate-400 rounded-lg font-black text-[9px] uppercase tracking-wider">ODRZUĆ</button>
               <button onClick={() => onFinish(notes, seconds)} className="flex-1 gold-shimmer text-white py-3 rounded-lg font-black text-[9px] uppercase shadow-lg tracking-widest">ZAPISZ</button>
@@ -750,9 +673,9 @@ const ActiveWorkout: React.FC<{ state: AppState, onUpdate: (w: WorkoutSession) =
   );
 };
 
-const HistoryView: React.FC<{ history: WorkoutSession[], t: any, profile: UserProfile, onTogglePro: () => void }> = ({ history, t, profile, onTogglePro }) => {
+const HistoryView: React.FC<{ history: WorkoutSession[], profile: UserProfile, onTogglePro: () => void }> = ({ history, profile, onTogglePro }) => {
   const navigate = useNavigate();
-  const [showUpsell, setShowUpsell] = useState(false);
+  const [showUpsell, useState] = React.useState(false);
 
   const generatePDF = () => {
     if (!profile.isPro) {
@@ -837,7 +760,7 @@ const HistoryView: React.FC<{ history: WorkoutSession[], t: any, profile: UserPr
                <div className="w-16 h-16 gold-shimmer rounded-2xl flex items-center justify-center text-white text-3xl mx-auto shadow-2xl"><i className="fa-solid fa-crown"></i></div>
                <div className="space-y-2">
                  <h3 className="text-xl font-black uppercase text-gold">WYBIERZ PRO</h3>
-                 <p className="text-slate-400 text-xs font-medium italic opacity-90 leading-relaxed px-4">{t.pdfLocked}</p>
+                 <p className="text-slate-400 text-xs font-medium italic opacity-90 leading-relaxed px-4">{T.pdfLocked}</p>
                </div>
                <button onClick={() => { onTogglePro(); setShowUpsell(false); }} className="gold-shimmer w-full py-4 rounded-xl font-black uppercase tracking-widest text-white shadow-xl tap-scale text-[11px]">ODBLOKUJ EKSPORT</button>
                <button onClick={() => setShowUpsell(false)} className="text-slate-500 font-black uppercase text-[8px] tracking-[0.4em] hover:text-white">MOŻE PÓŹNIEJ</button>
@@ -848,7 +771,7 @@ const HistoryView: React.FC<{ history: WorkoutSession[], t: any, profile: UserPr
   );
 };
 
-const WorkoutDetail = ({ history, t }: { history: WorkoutSession[], t: any }) => {
+const WorkoutDetail = ({ history }: { history: WorkoutSession[] }) => {
   const { id } = useParams();
   const workout = history.find(h => h.id === id);
   const navigate = useNavigate();
@@ -869,7 +792,7 @@ const WorkoutDetail = ({ history, t }: { history: WorkoutSession[], t: any }) =>
             <p className="text-base font-black text-white mt-0.5 tabular-nums">{formatTime(workout.durationSeconds || 0)}</p>
           </div>
           <div className="glass p-3.5 rounded-xl border border-white/5">
-            <span className="text-[7px] font-black text-slate-500 uppercase tracking-widest">Całkowita Objętość</span>
+            <span className="text-[7px] font-black text-slate-500 uppercase tracking-widest">Objętość</span>
             <p className="text-base font-black text-gold mt-0.5 tabular-nums">{workout.exercises.reduce((acc, ex) => acc + ex.sets.reduce((sacc, s) => sacc + (s.weight * s.reps), 0), 0)} kg</p>
           </div>
        </div>
@@ -895,18 +818,18 @@ const WorkoutDetail = ({ history, t }: { history: WorkoutSession[], t: any }) =>
   );
 };
 
-const Onboarding: React.FC<{ onComplete: (p: UserProfile) => void, t: any }> = ({ onComplete, t }) => {
+const Onboarding: React.FC<{ onComplete: (p: UserProfile) => void }> = ({ onComplete }) => {
   const [step, setStep] = useState(1);
   const [profile, setProfile] = useState<any>({ 
     name: '', 
     gender: 'mężczyzna', 
+    language: 'pl',
     age: 25, 
     weight: 80, 
     height: 180, 
     goal: GoalType.GYM, 
     injuries: 'Brak ograniczeń', 
     level: 'średniozaawansowany', 
-    language: 'pl',
     hapticsEnabled: true
   });
   
@@ -938,43 +861,36 @@ const Onboarding: React.FC<{ onComplete: (p: UserProfile) => void, t: any }> = (
               <label className="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] block ml-1">Tożsamość</label>
               <input type="text" value={profile.name} onChange={e => setProfile({...profile, name: e.target.value})} className="w-full glass border border-white/10 p-4 rounded-xl font-black text-white text-center text-base outline-none focus:border-gold transition-colors" placeholder="WPISZ IMIĘ..." />
             </div>
-            
             <div className="space-y-1.5">
-              <label className="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] block ml-1">{t.gender}</label>
+              <label className="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] block ml-1">{T.gender}</label>
               <select 
                 value={profile.gender} 
                 onChange={e => setProfile({...profile, gender: e.target.value as Gender})}
                 className="w-full glass border border-white/10 p-4 rounded-xl font-black text-white outline-none focus:border-gold transition-colors appearance-none bg-black/40 text-sm text-center"
               >
-                <option value="mężczyzna">{t.male}</option>
-                <option value="kobieta">{t.female}</option>
-                <option value="nie chcę podawać">{t.other}</option>
+                <option value="mężczyzna">{T.male}</option>
+                <option value="kobieta">{T.female}</option>
+                <option value="nie chcę podawać">{T.other}</option>
               </select>
-            </div>
-
-            <div className="flex gap-2.5 pt-1">
-              {['pl', 'en'].map(l => (
-                <button key={l} onClick={() => setProfile({...profile, language: l as Language})} className={`flex-1 py-3.5 rounded-xl font-black border uppercase glass text-[10px] tracking-widest ${profile.language === l ? 'border-gold text-white shadow-lg' : 'border-white/5 text-slate-500'}`}>{l}</button>
-              ))}
             </div>
           </div>
         )}
         {step === 2 && (
           <div className="space-y-4 animate-fadeIn">
              <div className="space-y-1.5">
-                <label className="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] block ml-1">{t.age}</label>
+                <label className="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] block ml-1">{T.age}</label>
                 <select value={profile.age} onChange={e => setProfile({...profile, age: Number(e.target.value)})} className="glass border border-white/10 w-full p-4 rounded-xl text-center text-white font-black text-base outline-none focus:border-gold appearance-none bg-black/40">
                   {ageOptions.map(a => <option key={a} value={a} className="bg-slate-900">{a}</option>)}
                 </select>
              </div>
              <div className="space-y-1.5">
-                <label className="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] block ml-1">{t.weight}</label>
+                <label className="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] block ml-1">{T.weight}</label>
                 <select value={profile.weight} onChange={e => setProfile({...profile, weight: Number(e.target.value)})} className="glass border border-white/10 w-full p-4 rounded-xl text-center text-white font-black text-base outline-none focus:border-gold appearance-none bg-black/40">
                   {weightOptions.map(w => <option key={w} value={w} className="bg-slate-900">{w} kg</option>)}
                 </select>
              </div>
              <div className="space-y-1.5">
-                <label className="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] block ml-1">{t.height}</label>
+                <label className="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] block ml-1">{T.height}</label>
                 <select value={profile.height} onChange={e => setProfile({...profile, height: Number(e.target.value)})} className="glass border border-white/10 w-full p-4 rounded-xl text-center text-white font-black text-base outline-none focus:border-gold appearance-none bg-black/40">
                   {heightOptions.map(h => <option key={h} value={h} className="bg-slate-900">{h} cm</option>)}
                 </select>
@@ -992,27 +908,20 @@ const Onboarding: React.FC<{ onComplete: (p: UserProfile) => void, t: any }> = (
         {step === 4 && (
           <div className="space-y-5 animate-fadeIn text-center">
             <div className="space-y-3">
-              <label className="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] block ml-1">{t.injuriesLabel}</label>
+              <label className="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] block ml-1">{T.injuriesLabel}</label>
               <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto no-scrollbar p-1">
                 {COMMON_INJURIES.map(inj => (
-                  <button 
-                    key={inj} 
-                    onClick={() => setProfile({...profile, injuries: inj})} 
-                    className={`p-4 rounded-xl border font-black text-[10px] uppercase glass tracking-wider transition-all ${profile.injuries === inj ? 'border-gold text-white bg-gold/10' : 'border-white/5 text-slate-500'}`}
-                  >
-                    {inj}
-                  </button>
+                  <button key={inj} onClick={() => setProfile({...profile, injuries: inj})} className={`p-4 rounded-xl border font-black text-[10px] uppercase glass tracking-wider transition-all ${profile.injuries === inj ? 'border-gold text-white bg-gold/10' : 'border-white/5 text-slate-500'}`}>{inj}</button>
                 ))}
               </div>
             </div>
-            <p className="text-[9px] text-slate-500 italic font-medium px-4 leading-relaxed opacity-70">AI dostosuje ćwiczenia tak, aby dbać o Twoje zdrowie.</p>
           </div>
         )}
       </div>
       <div className="flex gap-3">
         {step > 1 && <button onClick={() => setStep(step - 1)} className="flex-1 py-4 bg-slate-900 text-slate-500 rounded-xl font-black uppercase text-[9px] tracking-widest border border-white/5 tap-scale">Wstecz</button>}
         <button onClick={() => step < 4 ? setStep(step + 1) : finish()} className="flex-[2] gold-shimmer text-white py-4 rounded-xl font-black uppercase text-[10px] shadow-2xl tracking-[0.2em] tap-scale">
-          {step === 4 ? "WYKUJ PRZEZNACZENIE" : "Dalej"}
+          {step === 4 ? "WYKUCI PRZEZNACZENIE" : "Dalej"}
         </button>
       </div>
     </div>
@@ -1028,8 +937,6 @@ const App: React.FC = () => {
   const [showFullAd, setShowFullAd] = useState(false);
 
   useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }, [state]);
-
-  const t = TRANSLATIONS[state.profile?.language || 'pl'];
 
   const togglePro = () => setState(prev => ({ ...prev, profile: prev.profile ? { ...prev.profile, isPro: !prev.profile.isPro } : null }));
   
@@ -1053,7 +960,7 @@ const App: React.FC = () => {
     else window.location.hash = '#/';
   };
 
-  if (!state.profile?.onboarded) return <Onboarding onComplete={p => setState({...state, profile: p})} t={TRANSLATIONS.pl} />;
+  if (!state.profile?.onboarded) return <Onboarding onComplete={p => setState({...state, profile: p})} />;
 
   const ageOptions = Array.from({ length: 86 }, (_, i) => i + 14);
   const weightOptions = Array.from({ length: 171 }, (_, i) => i + 30);
@@ -1069,9 +976,9 @@ const App: React.FC = () => {
               <h3 className="text-lg font-black uppercase text-white tracking-[0.2em] animate-pulse">PROJEKTOWANIE AI...</h3>
             </div>
           )}
-          {showFullAd && <FullscreenAd t={t} onClose={() => { setShowFullAd(false); window.location.hash = '#/'; }} />}
+          {showFullAd && <FullscreenAd onClose={() => { setShowFullAd(false); window.location.hash = '#/'; }} />}
           <Routes>
-            <Route path="/" element={<Dashboard state={state} setState={setState} t={t} />} />
+            <Route path="/" element={<Dashboard state={state} setState={setState} />} />
             <Route path="/new-plan" element={
               <div className="flex-1 p-6 space-y-4 overflow-y-auto no-scrollbar pt-10 animate-fadeIn safe-pt">
                 <h2 className="text-2xl font-black uppercase text-white text-center mb-5 tracking-tighter">Wybierz Architekturę</h2>
@@ -1101,7 +1008,7 @@ const App: React.FC = () => {
                     }} className="glass border border-white/5 p-4 rounded-2xl flex items-center justify-between hover:border-gold/30 transition-all active:scale-95 shadow-xl tap-scale group">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 glass rounded-xl flex items-center justify-center text-gold group-active:scale-110 transition-transform"><i className={`fa-solid ${PLAN_ICONS[p]} text-lg`}></i></div>
-                        <h4 className="text-sm font-black uppercase text-white tracking-tight">{t.planTypes[p]}</h4>
+                        <h4 className="text-sm font-black uppercase text-white tracking-tight">{T.planTypes[p]}</h4>
                       </div>
                       <i className="fa-solid fa-chevron-right text-gold text-[10px] opacity-40"></i>
                     </button>
@@ -1110,13 +1017,12 @@ const App: React.FC = () => {
                 </div>
               </div>
             } />
-            <Route path="/active" element={<ActiveWorkout state={state} onUpdate={w => setState({...state, activeWorkout: w})} onSetPrefRest={(rest) => updateProfile({ preferredRestTime: rest })} onFinish={finalizeWorkout} onTogglePro={togglePro} t={t} />} />
-            <Route path="/history" element={<HistoryView history={state.history} t={t} profile={state.profile!} onTogglePro={togglePro} />} />
-            <Route path="/history/:id" element={<WorkoutDetail history={state.history} t={t} />} />
+            <Route path="/active" element={<ActiveWorkout state={state} onUpdate={w => setState({...state, activeWorkout: w})} onSetPrefRest={(rest) => updateProfile({ preferredRestTime: rest })} onFinish={finalizeWorkout} onTogglePro={togglePro} />} />
+            <Route path="/history" element={<HistoryView history={state.history} profile={state.profile!} onTogglePro={togglePro} />} />
+            <Route path="/history/:id" element={<WorkoutDetail history={state.history} />} />
             <Route path="/settings" element={
               <div className="flex-1 p-6 overflow-y-auto no-scrollbar pt-8 space-y-5 animate-fadeIn safe-pt">
                  <h2 className="text-2xl font-black uppercase text-white text-center mb-2 tracking-tighter">Profil Operatora</h2>
-                 
                  <div className={`glass-card border rounded-3xl p-5 shadow-2xl relative overflow-hidden transition-all ${state.profile?.isPro ? 'border-gold/30 bg-gold/5' : 'border-white/5'}`}>
                     <div className="relative z-10 flex flex-col gap-3.5">
                        <div className="flex items-center justify-between">
@@ -1124,13 +1030,13 @@ const App: React.FC = () => {
                              <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-white text-lg ${state.profile?.isPro ? 'gold-shimmer shadow-lg' : 'bg-slate-800'}`}>
                                 <i className="fa-solid fa-crown"></i>
                              </div>
-                             <h3 className={`text-lg font-black uppercase tracking-tight ${state.profile?.isPro ? 'text-gold' : 'text-white'}`}>{t.proTitle}</h3>
+                             <h3 className={`text-lg font-black uppercase tracking-tight ${state.profile?.isPro ? 'text-gold' : 'text-white'}`}>{T.proTitle}</h3>
                           </div>
                        </div>
-                       <p className="text-[10px] text-slate-400 font-medium italic">"{t.proDesc}"</p>
+                       <p className="text-[10px] text-slate-400 font-medium italic">"{T.proDesc}"</p>
                        {!state.profile?.isPro && (
                           <button onClick={togglePro} className="gold-shimmer w-full py-3.5 rounded-xl text-white font-black uppercase text-[10px] tracking-[0.2em] shadow-xl tap-scale">
-                             {t.getPro}
+                             {T.getPro}
                           </button>
                        )}
                        {state.profile?.isPro && (
@@ -1140,7 +1046,6 @@ const App: React.FC = () => {
                        )}
                     </div>
                  </div>
-
                  <div className="glass-card border border-white/5 p-5 rounded-3xl space-y-5 shadow-2xl">
                     <div className="flex items-center gap-4">
                        <div className="w-14 h-14 gold-shimmer rounded-xl flex items-center justify-center text-white text-2xl font-black shadow-lg">{state.profile?.name.charAt(0)}</div>
@@ -1149,43 +1054,35 @@ const App: React.FC = () => {
                          <p className="text-[9px] font-black text-gold uppercase mt-1 tracking-widest">{state.profile?.goal}</p>
                        </div>
                     </div>
-
                     <div className="space-y-4 pt-2">
                        <div className="flex items-center justify-between">
-                          <label className="text-[8px] font-black text-slate-500 uppercase tracking-widest">{t.hapticsLabel}</label>
-                          <button 
-                            onClick={() => updateProfile({ hapticsEnabled: !state.profile?.hapticsEnabled })}
-                            className={`w-10 h-5 rounded-full transition-all relative ${state.profile?.hapticsEnabled ? 'bg-gold' : 'bg-slate-800'}`}
-                          >
+                          <label className="text-[8px] font-black text-slate-500 uppercase tracking-widest">{T.hapticsLabel}</label>
+                          <button onClick={() => updateProfile({ hapticsEnabled: !state.profile?.hapticsEnabled })} className={`w-10 h-5 rounded-full transition-all relative ${state.profile?.hapticsEnabled ? 'bg-gold' : 'bg-slate-800'}`}>
                             <div className={`absolute top-1 w-3 h-3 rounded-full bg-white transition-all ${state.profile?.hapticsEnabled ? 'left-6' : 'left-1'}`}></div>
                           </button>
                        </div>
                     </div>
-
                     <div className="space-y-1.5">
-                       <label className="text-[8px] font-black text-slate-500 uppercase tracking-widest block ml-1">{t.gender}</label>
-                       <select 
-                          value={state.profile?.gender} 
-                          onChange={e => updateProfile({ gender: e.target.value as Gender })}
-                          className="w-full glass bg-slate-900 text-white font-black p-3.5 rounded-xl outline-none border border-white/5 text-xs"
-                       >
-                          <option value="mężczyzna">{t.male}</option>
-                          <option value="kobieta">{t.female}</option>
-                          <option value="nie chcę podawać">{t.other}</option>
+                       <label className="text-[8px] font-black text-slate-500 uppercase tracking-widest block ml-1">{T.language}</label>
+                       <select value={state.profile?.language} onChange={e => updateProfile({ language: e.target.value as 'pl' | 'en' })} className="w-full glass bg-slate-900 text-white font-black p-3.5 rounded-xl outline-none border border-white/5 text-xs">
+                          <option value="pl">Polski</option>
+                          <option value="en">English</option>
                        </select>
                     </div>
-
                     <div className="space-y-1.5">
-                       <label className="text-[8px] font-black text-slate-500 uppercase tracking-widest block ml-1">{t.injuriesLabel}</label>
-                       <select 
-                          value={state.profile?.injuries} 
-                          onChange={e => updateProfile({ injuries: e.target.value })}
-                          className="w-full glass bg-slate-900 text-white font-black p-3.5 rounded-xl outline-none border border-white/5 text-xs"
-                       >
+                       <label className="text-[8px] font-black text-slate-500 uppercase tracking-widest block ml-1">{T.gender}</label>
+                       <select value={state.profile?.gender} onChange={e => updateProfile({ gender: e.target.value as Gender })} className="w-full glass bg-slate-900 text-white font-black p-3.5 rounded-xl outline-none border border-white/5 text-xs">
+                          <option value="mężczyzna">{T.male}</option>
+                          <option value="kobieta">{T.female}</option>
+                          <option value="nie chcę podawać">{T.other}</option>
+                       </select>
+                    </div>
+                    <div className="space-y-1.5">
+                       <label className="text-[8px] font-black text-slate-500 uppercase tracking-widest block ml-1">{T.injuriesLabel}</label>
+                       <select value={state.profile?.injuries} onChange={e => updateProfile({ injuries: e.target.value })} className="w-full glass bg-slate-900 text-white font-black p-3.5 rounded-xl outline-none border border-white/5 text-xs">
                           {COMMON_INJURIES.map(inj => <option key={inj} value={inj}>{inj}</option>)}
                        </select>
                     </div>
-
                     <div className="grid grid-cols-3 gap-3">
                        <div className="bg-black/40 p-3 rounded-xl border border-white/5 space-y-1 shadow-inner">
                          <span className="text-[7px] font-black text-slate-500 uppercase">WIEK</span>
@@ -1196,13 +1093,13 @@ const App: React.FC = () => {
                        <div className="bg-black/40 p-3 rounded-xl border border-white/5 space-y-1 shadow-inner">
                          <span className="text-[7px] font-black text-slate-500 uppercase">WAGA</span>
                          <select value={state.profile?.weight} onChange={e => updateProfile({ weight: Number(e.target.value) })} className="bg-transparent text-sm font-black text-white outline-none w-full appearance-none">
-                           {weightOptions.map(w => <option key={w} value={w} className="bg-slate-900">{w}</option>)}
+                           {weightOptions.map(w => <option key={w} value={w} className="bg-slate-900">{w} kg</option>)}
                          </select>
                        </div>
                        <div className="bg-black/40 p-3 rounded-xl border border-white/5 space-y-1 shadow-inner">
                          <span className="text-[7px] font-black text-slate-500 uppercase">WZROST</span>
                          <select value={state.profile?.height} onChange={e => updateProfile({ height: Number(e.target.value) })} className="bg-transparent text-sm font-black text-white outline-none w-full appearance-none">
-                           {heightOptions.map(h => <option key={h} value={h} className="bg-slate-900">{h}</option>)}
+                           {heightOptions.map(h => <option key={h} value={h} className="bg-slate-900">{h} cm</option>)}
                          </select>
                        </div>
                     </div>
@@ -1212,11 +1109,11 @@ const App: React.FC = () => {
             } />
           </Routes>
         </main>
-        {!state.profile?.isPro && <BannerAd t={t} />}
+        {!state.profile?.isPro && <BannerAd />}
         <nav className="glass px-2 py-3 flex justify-around items-center border-t border-white/10 z-[500] safe-area-pb">
-          <NavBtn to="/" icon="fa-house" label={t.dashboard} />
-          <NavBtn to="/history" icon="fa-clock-rotate-left" label={t.history} />
-          <NavBtn to="/settings" icon="fa-circle-user" label={t.settings} />
+          <NavBtn to="/" icon="fa-house" label={T.dashboard} />
+          <NavBtn to="/history" icon="fa-clock-rotate-left" label={T.history} />
+          <NavBtn to="/settings" icon="fa-circle-user" label={T.settings} />
         </nav>
       </div>
     </Router>

@@ -1,36 +1,26 @@
-
 {
-  "name": "wykuci-ai",
-  "version": "1.0.0",
+  "name": "wykuci",
   "private": true,
+  "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && (npx cap add ios || true) && npx cap sync ios",
-    "preview": "vite preview",
-    "ionic:build": "npm run build",
-    "ionic:cap-copy": "npx cap copy"
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@capacitor/android": "^6.0.0",
-    "@capacitor/cli": "^6.0.0",
-    "@capacitor/core": "^6.0.0",
-    "@capacitor/ios": "^6.0.0",
-    "@ionic/react": "^8.0.0",
-    "@google/genai": "^1.35.0",
-    "jspdf": "^2.5.1",
-    "jspdf-autotable": "^3.8.2",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-router-dom": "^6.28.1",
-    "recharts": "^2.15.0"
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "react-router-dom": "6.28.1",
+    "recharts": "2.15.0",
+    "@google/genai": "1.35.0",
+    "jspdf": "2.5.1",
+    "jspdf-autotable": "3.8.2"
   },
   "devDependencies": {
-    "@types/node": "^22.10.2",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "@vitejs/plugin-react": "^4.3.4",
-    "typescript": "^5.7.2",
-    "vite": "^6.0.0"
+    "@types/node": "^22.14.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0"
   }
 }

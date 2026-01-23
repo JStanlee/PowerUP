@@ -1,8 +1,7 @@
 {
   "name": "Wykuci",
-  "description": "Profesjonalny asystent treningowy AI wykorzystujący Gemini do personalizacji planów.",
+  "description": "Twój asystent AI",
   "requestFramePermissions": [
-    "camera",
-    "microphone"
+    "camera"
   ]
 }
