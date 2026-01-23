@@ -6,9 +6,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && (npx cap add ios || true) && npx cap sync ios",
     "preview": "vite preview",
-    "ionic:build": "npm run build && (npx cap add ios || true) && npx cap sync ios",
+    "ionic:build": "npm run build",
     "ionic:cap-copy": "npx cap copy"
   },
   "dependencies": {
@@ -16,6 +16,7 @@
     "@capacitor/cli": "^6.0.0",
     "@capacitor/core": "^6.0.0",
     "@capacitor/ios": "^6.0.0",
+    "@ionic/react": "^8.0.0",
     "@google/genai": "^1.35.0",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.8.2",
