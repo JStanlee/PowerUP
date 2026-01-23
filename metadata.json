@@ -1,6 +1,6 @@
 {
-  "name": "PowerUP",
-  "description": "Twój osobisty asystent treningowy AI, który tworzy spersonalizowane plany na podstawie Twoich celów sportowych i postępów.",
+  "name": "Wykuci",
+  "description": "Twój asystent AI",
   "requestFramePermissions": [
     "camera"
   ]
