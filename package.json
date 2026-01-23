@@ -2,11 +2,10 @@
 {
   "name": "wykuci-ai",
   "version": "1.0.0",
-  "description": "Profesjonalny asystent treningowy AI",
+  "private": true,
   "type": "module",
-  "main": "index.tsx",
   "scripts": {
-    "start": "vite",
+    "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
@@ -24,6 +23,7 @@
     "recharts": "^2.15.0"
   },
   "devDependencies": {
+    "@types/node": "^22.10.2",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.3.4",
