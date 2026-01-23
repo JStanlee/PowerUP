@@ -1,0 +1,9 @@
+{
+  "appId": "com.wykuci.app",
+  "appName": "Wykuci",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  }
+}

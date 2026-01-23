@@ -25,6 +25,7 @@ export enum PlanType {
 }
 
 export type Gender = 'mężczyzna' | 'kobieta' | 'nie chcę podawać';
+export type Language = 'pl' | 'en';
 
 export interface SetLog {
   reps: number;
@@ -54,7 +55,6 @@ export interface WarmupExercise {
 
 export interface WorkoutSession {
   id: string;
-  userId: string;
   date: string;
   goal: GoalType;
   planType?: PlanType;
@@ -78,11 +78,8 @@ export interface GymRatStatus {
 }
 
 export interface UserProfile {
-  uid: string;
-  email: string;
   name: string;
   gender: Gender;
-  language: 'pl';
   goal: GoalType;
   goalDescription: string;
   age: number;
@@ -94,16 +91,16 @@ export interface UserProfile {
   preferredDays: number[];
   onboarded: boolean;
   isPro: boolean;
-  hapticsEnabled: boolean;
+  hapticsEnabled: boolean; // Nowe pole
   defaultPlan?: PlanType;
   gymRat: GymRatStatus;
+  language: Language;
   preferredRestTime?: number;
   lastPlanType?: PlanType;
   weightHistory: {date: string, weight: number}[];
 }
 
 export interface AppState {
-  user: { uid: string; email: string } | null;
   profile: UserProfile | null;
   history: WorkoutSession[];
   activeWorkout: WorkoutSession | null;
