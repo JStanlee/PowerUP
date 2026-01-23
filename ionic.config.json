@@ -1,0 +1,8 @@
+
+{
+  "name": "Wykuci",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
