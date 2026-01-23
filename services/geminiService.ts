@@ -73,7 +73,8 @@ export const generateWorkout = async (profile: UserProfile, history: WorkoutSess
     }
   });
 
-  const text = response.text || "{}";
+  const responseText = response.text;
+  const text = responseText || "{}";
   return JSON.parse(text.trim());
 };
 
@@ -104,7 +105,8 @@ export const swapExercise = async (profile: UserProfile, currentExerciseName: st
     }
   });
   
-  const text = response.text || "{}";
+  const responseText = response.text;
+  const text = responseText || "{}";
   return JSON.parse(text.trim());
 };
 
@@ -122,9 +124,15 @@ export const generateExerciseImage = async (exerciseName: string) => {
     contents: { parts: [{ text: `Fitness exercise: ${exerciseName}. Dark background, gold highlights.` }] },
   });
   
-  if (response.candidates && response.candidates[0] && response.candidates[0].content.parts) {
-    for (const part of response.candidates[0].content.parts) {
-      if (part.inlineData) return `data:image/png;base64,${part.inlineData.data}`;
+  // Bezpieczne pobranie kandydatów i części odpowiedzi
+  const candidate = response.candidates?.[0];
+  const parts = candidate?.content?.parts;
+
+  if (parts) {
+    for (const part of parts) {
+      if (part.inlineData) {
+        return `data:image/png;base64,${part.inlineData.data}`;
+      }
     }
   }
   return null;
