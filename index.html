@@ -9,8 +9,8 @@
     <meta name="theme-color" content="#000000">
     <link rel="manifest" href="./manifest.json">
     
-    <!-- Apple Touch Icon -->
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg width='512' height='512' viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='512' height='512' fill='black'/%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%238B6508'/%3E%3Cstop offset='50%25' style='stop-color:%23D4AF37'/%3E%3Cstop offset='100%25' style='stop-color:%23FFD700'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M120 180 L200 380 L256 280 L312 380 L392 180' stroke='url(%23g)' stroke-width='45' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='256' cy='140' r='20' fill='%23D4AF37'/%3E%3C/svg%3E">
+    <!-- Apple Touch Icon (Dla PWA i iOS) -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg width='512' height='512' viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='512' height='512' rx='100' fill='black'/%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%238B6508'/%3E%3Cstop offset='50%25' style='stop-color:%23D4AF37'/%3E%3Cstop offset='100%25' style='stop-color:%23FFD700'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M120 180 L200 380 L256 280 L312 380 L392 180' stroke='url(%23g)' stroke-width='45' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='256' cy='140' r='20' fill='%23D4AF37'/%3E%3C/svg%3E">
 
     <title>Wykuci - AI Body Sculpting</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -42,9 +42,28 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
-        :root { --sat: env(safe-area-inset-top); --sab: env(safe-area-inset-bottom); }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #000; color: #fff; -webkit-tap-highlight-color: transparent; overflow: hidden; position: fixed; width: 100%; height: 100%; margin: 0; }
-        #root { height: 100%; display: flex; flex-direction: column; padding-top: var(--sat); padding-bottom: var(--sab); }
+        :root { 
+          --sat: env(safe-area-inset-top); 
+          --sab: env(safe-area-inset-bottom); 
+        }
+        body { 
+          font-family: 'Plus Jakarta Sans', sans-serif; 
+          background-color: #000; 
+          color: #fff; 
+          -webkit-tap-highlight-color: transparent; 
+          overflow: hidden; 
+          position: fixed; 
+          width: 100%; 
+          height: 100%; 
+          margin: 0; 
+        }
+        #root { 
+          height: 100%; 
+          display: flex; 
+          flex-direction: column; 
+          padding-top: var(--sat); 
+          padding-bottom: var(--sab); 
+        }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .glass { background: rgba(15, 15, 15, 0.8); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .glass-card { background: linear-gradient(135deg, rgba(30, 30, 30, 0.4), rgba(5, 5, 5, 0.7)); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.05); }
@@ -76,6 +95,7 @@
 </head>
 <body class="dark">
     <div id="root"></div>
+    <!-- Vite automatycznie obsłuży ten import bez potrzeby importmap -->
     <script type="module" src="/index.tsx"></script>
 </body>
 </html>
