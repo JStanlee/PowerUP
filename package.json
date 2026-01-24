@@ -22,7 +22,7 @@
     "@capacitor/ios": "^6.0.0",
     "@capacitor/keyboard": "^6.0.0",
     "@capacitor/status-bar": "^6.0.0",
-    "@google/genai": "^0.21.0",
+    "@google/genai": "^1.38.0",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.8.2",
     "react": "^19.0.0",
