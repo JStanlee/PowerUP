@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { HashRouter as Router, Routes, Route, Link, useLocation, Navigate, useParams, useNavigate } from 'react-router-dom';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
-import { GoalType, UserProfile, WorkoutSession, AppState, ExerciseLog, PlanType, Gender } from './types.ts';
-import { generateWorkout, getCoachTip, generateExerciseImage, swapExercise } from './services/geminiService.ts';
+import { GoalType, UserProfile, WorkoutSession, AppState, ExerciseLog, PlanType, Gender } from './types';
+import { generateWorkout, getCoachTip, generateExerciseImage, swapExercise } from './services/geminiService';
 
 const STORAGE_KEY = 'wykuci_black_edition_v3';
 
@@ -675,7 +674,6 @@ const ActiveWorkout: React.FC<{ state: AppState, onUpdate: (w: WorkoutSession) =
 
 const HistoryView: React.FC<{ history: WorkoutSession[], profile: UserProfile, onTogglePro: () => void }> = ({ history, profile, onTogglePro }) => {
   const navigate = useNavigate();
-  // Fixed incorrect destructuring of useState: changed from [showUpsell, useState] to [showUpsell, setShowUpsell]
   const [showUpsell, setShowUpsell] = React.useState(false);
 
   const generatePDF = () => {
