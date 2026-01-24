@@ -675,7 +675,8 @@ const ActiveWorkout: React.FC<{ state: AppState, onUpdate: (w: WorkoutSession) =
 
 const HistoryView: React.FC<{ history: WorkoutSession[], profile: UserProfile, onTogglePro: () => void }> = ({ history, profile, onTogglePro }) => {
   const navigate = useNavigate();
-  const [showUpsell, useState] = React.useState(false);
+  // Fixed incorrect destructuring of useState: changed from [showUpsell, useState] to [showUpsell, setShowUpsell]
+  const [showUpsell, setShowUpsell] = React.useState(false);
 
   const generatePDF = () => {
     if (!profile.isPro) {
